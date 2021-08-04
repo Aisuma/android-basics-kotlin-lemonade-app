@@ -15,10 +15,10 @@
  */
 package com.example.lemonade
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
@@ -67,10 +67,11 @@ class MainActivity : AppCompatActivity() {
         setViewElements()
         lemonImage!!.setOnClickListener {
             // TODO: call the method that handles the state when the image is clicked
+            clickLemonImage()
         }
         lemonImage!!.setOnLongClickListener {
             // TODO: replace 'false' with a call to the function that shows the squeeze count
-            false
+            showSnackbar()
         }
     }
 
@@ -111,6 +112,26 @@ class MainActivity : AppCompatActivity() {
 
         // TODO: lastly, before the function terminates we need to set the view elements so that the
         //  UI can reflect the correct state
+
+        when (lemonadeState) {
+            SELECT -> {
+                lemonadeState = SQUEEZE
+                lemonTree.pick()
+                squeezeCount = 0
+            }
+            SQUEEZE -> {
+                lemonSize = 1
+                squeezeCount++
+                lemonSize--
+                if (lemonSize == 0) { lemonadeState = DRINK }
+            }
+            DRINK -> {
+                lemonadeState = RESTART
+                lemonSize = -1
+            }
+            RESTART -> lemonadeState = SELECT
+        }
+        setViewElements()
     }
 
     /**
@@ -118,6 +139,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setViewElements() {
         val textAction: TextView = findViewById(R.id.text_action)
+        val lemonImageView: ImageView = findViewById(R.id.image_lemon_state)
         // TODO: set up a conditional that tracks the lemonadeState
 
         // TODO: for each state, the textAction TextView should be set to the corresponding string from
@@ -126,6 +148,25 @@ class MainActivity : AppCompatActivity() {
         // TODO: Additionally, for each state, the lemonImage should be set to the corresponding
         //  drawable from the drawable resources. The drawables have the same names as the strings
         //  but remember that they are drawables, not strings.
+
+        when (lemonadeState) {
+            SELECT -> {
+                textAction.setText(getString(R.string.text_select_lemon))
+                lemonImageView.setImageResource(R.drawable.lemon_tree)
+            }
+            SQUEEZE -> {
+                textAction.setText(getString(R.string.lemon_text_juice))
+                lemonImageView.setImageResource(R.drawable.lemon_squeeze)
+            }
+            DRINK -> {
+                textAction.setText(getString(R.string.lemon_text_drink))
+                lemonImageView.setImageResource(R.drawable.lemon_drink)
+            }
+            RESTART -> {
+                textAction.setText(getString(R.string.lemon_text_restart))
+                lemonImageView.setImageResource(R.drawable.lemon_restart)
+            }
+        }
     }
 
     /**
